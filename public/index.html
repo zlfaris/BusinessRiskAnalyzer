@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Risk Analyzer — AI-Powered SaaS</title>
+    <meta name="description"
+        content="Analisis risiko bisnis Anda dengan AI. Dapatkan score viabilitas, BEP, dan taktik mitigasi dari Venture Capitalist AI.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body x-data="appData()" x-init="init()">
+
+
+    <div class="app-container">
+
+        <!-- ========================= -->
+        <!--       AUTH VIEW           -->
+        <!-- ========================= -->
+        <template x-if="view === 'auth'">
+            <div class="landing-hero fade-in">
+
+                <!-- Hero Content -->
+                <div class="hero-content">
+                    <div class="hero-logo text-base font-bold tracking-tight text-slate-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                            <rect width="48" height="48" rx="12" fill="#4F46E5" />
+                            <rect x="12" y="12" width="24" height="24" rx="2" fill="none" stroke="#FFFFFF"
+                                stroke-width="3" />
+                            <rect x="16" y="24" width="3.5" height="8" rx="1" fill="#FFFFFF" />
+                            <rect x="22.25" y="16" width="3.5" height="16" rx="1" fill="#FFFFFF" />
+                            <rect x="28.5" y="21" width="3.5" height="11" rx="1" fill="#FFFFFF" />
+                        </svg>
+                        Business Risk Analyzer
+                    </div>
+                    <h1 class="hero-slogan text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.2] pb-2 h-auto">Ketahui risiko bisnis Anda sebelum mengeluarkan modal.</h1>
+                    <p class="hero-subtitle text-base lg:text-lg text-slate-600 leading-relaxed">Platform analisis kelayakan bisnis dengan kecerdasan buatan berbasis
+                        Venture Capitalist yang membantu Anda mengambil keputusan krusial sebelum memulai.</p>
+                </div>
+
+                <!-- Auth Form Card -->
+                <div class="auth-card panel">
+                    <div class="auth-header">
+                        <h2 class="text-2xl lg:text-3xl font-bold tracking-tight text-slate-950"><span x-text="isLogin ? 'Welcome Back' : 'Get Started'"></span><span
+                                class="accent-text">.</span></h2>
+                        <p class="text-sm text-slate-500"
+                            x-text="isLogin ? 'Masuk ke akun Anda untuk melanjutkan.' : 'Buat akun baru untuk memulai simulasi.'">
+                        </p>
+                    </div>
+
+                    <!-- Error Alert -->
+                    <template x-if="authError">
+                        <div class="alert alert-error" role="alert">
+                            <i data-lucide="alert-circle"></i>
+                            <span x-text="authError"></span>
+                        </div>
+                    </template>
+
+                    <!-- Login Form -->
+                    <template x-if="isLogin">
+                        <form id="loginForm" @submit.prevent="login()" novalidate>
+                            <div class="form-group">
+                                <label for="login-email" class="text-xs font-semibold uppercase tracking-wider text-slate-700">Email</label>
+                                <input id="login-email" type="email" class="text-sm placeholder-slate-400" x-model="authForm.email"
+                                    placeholder="nama@perusahaan.com" autocomplete="email">
+                                <span class="field-error" x-show="authFieldErrors.email"
+                                    x-text="authFieldErrors.email"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password" class="text-xs font-semibold uppercase tracking-wider text-slate-700">Password</label>
+                                <input id="login-password" type="password" class="text-sm placeholder-slate-400" x-model="authForm.password"
+                                    placeholder="Min. 8 karakter" autocomplete="current-password">
+                                <span class="field-error" x-show="authFieldErrors.password"
+                                    x-text="authFieldErrors.password"></span>
+                            </div>
+                            <button id="loginBtn" type="submit" class="btn btn-accent w-full" :disabled="loading">
+                                <template x-if="!loading"><span>Masuk ke Dashboard</span></template>
+                                <template x-if="loading"><span class="spinner"></span></template>
+                            </button>
+                            <p class="auth-toggle">Belum punya akun? <a href="#" @click.prevent="toggleAuth()">Daftar di
+                                    sini</a></p>
+                        </form>
+                    </template>
+
+                    <!-- Register Form -->
+                    <template x-if="!isLogin">
+                        <form id="registerForm" @submit.prevent="register()" novalidate>
+                            <div class="form-group">
+                                <label for="reg-name" class="text-xs font-semibold uppercase tracking-wider text-slate-700">Nama Lengkap</label>
+                                <input id="reg-name" type="text" class="text-sm placeholder-slate-400" x-model="authForm.name" placeholder="John Doe"
+                                    autocomplete="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-email" class="text-xs font-semibold uppercase tracking-wider text-slate-700">Email</label>
+                                <input id="reg-email" type="email" class="text-sm placeholder-slate-400" x-model="authForm.email"
+                                    placeholder="nama@perusahaan.com" autocomplete="email">
+                                <span class="field-error" x-show="authFieldErrors.email"
+                                    x-text="authFieldErrors.email"></span>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-password" class="text-xs font-semibold uppercase tracking-wider text-slate-700">Password</label>
+                                <input id="reg-password" type="password" class="text-sm placeholder-slate-400" x-model="authForm.password"
+                                    placeholder="Min. 8 karakter" autocomplete="new-password">
+                                <span class="field-error" x-show="authFieldErrors.password"
+                                    x-text="authFieldErrors.password"></span>
+                            </div>
+                            <button id="registerBtn" type="submit" class="btn btn-accent w-full" :disabled="loading">
+                                <template x-if="!loading"><span>Buat Akun Gratis</span></template>
+                                <template x-if="loading"><span class="spinner"></span></template>
+                            </button>
+                            <p class="auth-toggle">Sudah punya akun? <a href="#" @click.prevent="toggleAuth()">Masuk di
+                                    sini</a></p>
+                        </form>
+                    </template>
+                </div>
+
+            </div>
+        </template>
+
+
+        <!-- ========================= -->
+        <!--     DASHBOARD VIEW        -->
+        <!-- ========================= -->
+        <template x-if="view === 'dashboard'">
+            <div class="dashboard-wrapper">
+
+                <!-- SIDEBAR -->
+                <div class="sidebar-backdrop" x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity style="display: none;"></div>
+                <aside class="sidebar" :class="{ 'sidebar-open': sidebarOpen }">
+
+                    <div class="sidebar-header">
+                        <div class="brand">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="44" height="44">
+                                <rect width="48" height="48" rx="12" fill="#4F46E5" />
+                                <rect x="12" y="12" width="24" height="24" rx="2" fill="none" stroke="#FFFFFF"
+                                    stroke-width="3" />
+                                <rect x="16" y="24" width="3.5" height="8" rx="1" fill="#FFFFFF" />
+                                <rect x="22.25" y="16" width="3.5" height="16" rx="1" fill="#FFFFFF" />
+                                <rect x="28.5" y="21" width="3.5" height="11" rx="1" fill="#FFFFFF" />
+                            </svg>
+                            <div class="brand-text text-base font-bold tracking-tight text-slate-900">
+                                <h2>Business Risk Analyzer</h2>
+                                <span class="brand-subtitle">TACTILE INTELLIGENCE</span>
+                            </div>
+                        </div>
+                        <button id="newAnalysisBtn" class="btn-new-analysis" @click="newAnalysis()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg> Analisis Bisnis Baru
+                        </button>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-wrapper">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input id="historySearch" type="text" x-model="searchQuery"
+                            placeholder="Cari bisnis atau kategori..." class="search-input">
+                    </div>
+
+                    <!-- History Section -->
+                    <div class="history-section">
+                        <h3 class="section-label">RECENT ANALYSES</h3>
+
+                        <div class="history-list">
+                            <template x-if="historyLoading">
+                                <div class="flex-center py-lg">
+                                    <div class="spinner-small"></div>
+                                </div>
+                            </template>
+
+                            <template x-for="item in filteredHistory" :key="item.id">
+                                <div class="history-card"
+                                    :class="{'active': currentAnalysis && currentAnalysis.id == item.id}"
+                                    @click="loadAnalysis(item)">
+                                    <div class="history-card-body">
+                                        <div class="history-title" x-text="item.business_name"></div>
+                                        <div class="history-meta">
+                                            <span class="badge badge-category" x-text="item.category"></span>
+                                            <span class="date" x-text="formatDate(item.created_at)"></span>
+                                        </div>
+                                    </div>
+                                    <button class="btn-delete" title="Hapus analisis ini"
+                                        @click.stop="deleteAnalysis(item.id)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6l-1 14H6L5 6"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                            <path d="M9 6V4h6v2"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+
+                            <template x-if="!historyLoading && filteredHistory.length === 0">
+                                <div class="empty-state">
+                                    <i data-lucide="inbox"></i>
+                                    <span x-text="searchQuery ? 'Tidak ditemukan.' : 'Belum ada riwayat.'"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- User Footer -->
+                    <div class="sidebar-footer">
+                        <div class="user-info">
+                            <div class="user-details">
+                                <span class="user-name" x-text="user?.name"></span>
+                                <span class="user-email" x-text="user?.email"></span>
+                            </div>
+                        </div>
+                        <button id="logoutBtn" class="btn-logout" @click="logout()" title="Logout">
+                            Logout
+                        </button>
+                    </div>
+
+                </aside>
+
+
+                <!-- MAIN CONTENT -->
+                <main class="main-content fade-in">
+
+                    <header class="topbar">
+                        <button class="btn-menu btn-icon" @click="toggleSidebar()" aria-label="Toggle Sidebar" type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <div>
+                            <h1 class="text-2xl lg:text-3xl font-bold"
+                                x-text="dashView === 'wizard' ? (editId ? 'Edit Asumsi Bisnis' : 'Business Risk Analyzer') : 'Hasil Analisis AI'">
+                            </h1>
+                            <p class="topbar-sub" x-show="dashView === 'wizard' && editId">
+                                Mengubah simulasi: <strong x-text="wizardForm.business_name"></strong>
+                            </p>
+                        </div>
+                    </header>
+
+                    <div class="content-body">
+
+                        <!-- WIZARD FORM -->
+                        <template x-if="dashView === 'wizard'">
+                            <div class="wizard-container fade-in">
+
+                                <form id="analysisForm" @submit.prevent="submitAnalysis()" novalidate>
+                                    <div class="section-title">Profil Bisnis</div>
+                                    <div class="form-grid">
+
+                                        <div class="form-group full-width">
+                                            <label for="business_name">Nama Bisnis <span
+                                                    class="required">*</span></label>
+                                            <input id="business_name" type="text" x-model="wizardForm.business_name"
+                                                placeholder="Min. 5 karakter, misal: Kopi Senja Malam"
+                                                :class="{'input-error': wizardErrors.business_name}">
+                                            <span class="field-error" x-show="wizardErrors.business_name"
+                                                x-text="wizardErrors.business_name"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="category">Kategori Bisnis <span
+                                                    class="required">*</span></label>
+                                            <select id="category" x-model="wizardForm.category"
+                                                :class="{'input-error': wizardErrors.category}">
+                                                <option value="" disabled>Pilih Kategori</option>
+                                                <option value="F&B">F&B (Makanan & Minuman)</option>
+                                                <option value="Jasa">Jasa / Layanan</option>
+                                                <option value="Retail">Retail / Produk Fisik</option>
+                                            </select>
+                                            <span class="field-error" x-show="wizardErrors.category"
+                                                x-text="wizardErrors.category"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="target_pasar_utama">Target Pasar Utama <span
+                                                    class="required">*</span></label>
+                                            <input id="target_pasar_utama" type="text"
+                                                x-model="wizardForm.target_pasar_utama"
+                                                placeholder="Misal: Mahasiswa berusia 18-25 tahun"
+                                                :class="{'input-error': wizardErrors.target_pasar_utama}">
+                                            <span class="field-error" x-show="wizardErrors.target_pasar_utama"
+                                                x-text="wizardErrors.target_pasar_utama"></span>
+                                        </div>
+
+                                        <div class="form-group full-width">
+                                            <label for="market_saturation">Kejenuhan Pasar <span
+                                                    class="required">*</span></label>
+                                            <select id="market_saturation" x-model="wizardForm.market_saturation"
+                                                :class="{'input-error': wizardErrors.market_saturation}">
+                                                <option value="" disabled>Pilih Tingkat Kejenuhan</option>
+                                                <option value="Belum ada">Belum ada - Belum ada saingan sama sekali</option>
+                                                <option value="Sedikit">Sedikit - Ada beberapa saingan kecil di sekitar lokasi</option>
+                                                <option value="Banyak">Banyak - Pasar sudah ramai</option>
+                                                <option value="Sangat Jenuh">Sangat Jenuh - Persaingan sangat ketat</option>
+                                            </select>
+                                            <span class="field-error" x-show="wizardErrors.market_saturation"
+                                                x-text="wizardErrors.market_saturation"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="section-divider"></div>
+                                    <div class="section-title">Data Keuangan</div>
+                                    <div class="form-grid">
+
+                                        <div class="form-group">
+                                            <label for="capex">CapEx - Modal Awal (IDR) <span
+                                                    class="required">*</span></label>
+                                            <div class="input-prefix-wrap">
+                                                <span class="input-prefix">Rp</span>
+                                                <input id="capex" type="number" x-model.number="wizardForm.capex"
+                                                    min="0" step="1" placeholder="50000000"
+                                                    :class="{'input-error': wizardErrors.capex}">
+                                            </div>
+                                            <span class="field-error" x-show="wizardErrors.capex"
+                                                x-text="wizardErrors.capex"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="opex">OpEx - Biaya Operasional/Bulan (IDR) <span
+                                                    class="required">*</span></label>
+                                            <div class="input-prefix-wrap">
+                                                <span class="input-prefix">Rp</span>
+                                                <input id="opex" type="number" x-model.number="wizardForm.opex" min="0"
+                                                    step="1" placeholder="10000000"
+                                                    :class="{'input-error': wizardErrors.opex}">
+                                            </div>
+                                            <span class="field-error" x-show="wizardErrors.opex"
+                                                x-text="wizardErrors.opex"></span>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="average_price">Harga Jual Rata-rata (IDR) <span
+                                                    class="required">*</span></label>
+                                            <div class="input-prefix-wrap">
+                                                <span class="input-prefix">Rp</span>
+                                                <input id="average_price" type="number"
+                                                    x-model.number="wizardForm.average_price" min="1" step="1"
+                                                    placeholder="25000"
+                                                    :class="{'input-error': wizardErrors.average_price}">
+                                            </div>
+                                            <span class="field-error" x-show="wizardErrors.average_price"
+                                                x-text="wizardErrors.average_price"></span>
+                                        </div>
+                                    </div>
+
+                                    <template x-if="analysisError">
+                                        <div class="alert alert-error mt-md">
+                                            <i data-lucide="alert-circle"></i>
+                                            <span x-text="analysisError"></span>
+                                        </div>
+                                    </template>
+
+                                    <div class="form-actions mt-lg">
+                                        <button id="cancelEditBtn" type="button" class="btn btn-ghost" x-show="editId"
+                                            @click="cancelEdit()">
+                                            Batal
+                                        </button>
+                                        <button id="submitAnalysisBtn" type="submit" class="btn btn-accent btn-lg"
+                                            :disabled="loading">
+                                            <template x-if="!loading">
+                                                <span><i data-lucide="zap"></i> <span
+                                                        x-text="editId ? 'Update & Re-Analisis' : 'Generate AI Analysis'"></span></span>
+                                            </template>
+                                            <template x-if="loading">
+                                                <span class="flex-center gap-sm">
+                                                    <span class="spinner"></span>
+                                                    <span>AI sedang menghitung risiko...</span>
+                                                </span>
+                                            </template>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </template>
+
+                        <!-- BENTO GRID RESULTS -->
+                        <template x-if="dashView === 'results' && currentAnalysis">
+                            <div class="bento-grid fade-in">
+
+                                <!-- Meta Card -->
+                                <div class="bento-card bento-meta">
+                                    <div class="meta-content">
+                                        <h2 x-text="currentAnalysis.business_name"></h2>
+                                        <div class="flex flex-wrap items-center gap-x-2 gap-y-2">
+                                            <span class="badge badge-category" x-text="currentAnalysis.category"></span>
+                                            <span class="badge badge-outline"
+                                                x-text="currentAnalysis.market_saturation === 'Belum ada' ? 'Belum ada kompetitor' : currentAnalysis.market_saturation"></span>
+                                            <span class="badge badge-category"
+                                                x-text="'Target: ' + currentAnalysis.target_pasar_utama"></span>
+                                        </div>
+                                    </div>
+                                    <button id="editAsumsiBtn" class="btn btn-ghost btn-sm gap-xs"
+                                        @click="editAnalysis()">
+                                        <i data-lucide="pencil"></i> Edit Asumsi
+                                    </button>
+                                </div>
+
+                                <!-- Score Card -->
+                                <div class="bento-card bento-score"
+                                    :class="getScoreClass(currentAnalysis.gemini_raw_response.score)">
+                                    <h3 class="card-label">Skor Viabilitas</h3>
+                                    <div class="score-gauge-wrapper">
+                                        <svg viewBox="0 0 36 36" class="circular-chart">
+                                            <path class="circle-bg"
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                            <path class="circle"
+                                                :stroke-dasharray="currentAnalysis.gemini_raw_response.score + ', 100'"
+                                                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                        </svg>
+                                        <div class="score-number" x-text="currentAnalysis.gemini_raw_response.score">
+                                        </div>
+                                    </div>
+                                    <p class="score-verdict"
+                                        x-text="getScoreLabel(currentAnalysis.gemini_raw_response.score)"></p>
+                                </div>
+
+                                <!-- BEP Card -->
+                                <div class="bento-card bento-bep">
+                                    <div class="card-header text-left">
+                                        <h3 class="card-title text-lg font-semibold">Break-Even Point</h3>
+                                    </div>
+                                    <p class="card-body text-left text-sm leading-relaxed"
+                                        x-text="currentAnalysis.gemini_raw_response.break_even_point_text"></p>
+                                </div>
+
+                                <!-- 4 Risk Cards Wrapper -->
+                                <div class="risk-cards-wrapper">
+                                    <div class="bento-card bento-risk h-full flex flex-col">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Risiko Keuangan</h3>
+                                        </div>
+                                        <p class="card-body text-left text-sm leading-relaxed"
+                                            x-text="currentAnalysis.gemini_raw_response.risiko_keuangan">
+                                        </p>
+                                    </div>
+
+                                    <div class="bento-card bento-risk h-full flex flex-col">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Risiko Pasar</h3>
+                                        </div>
+                                        <p class="card-body text-left text-sm leading-relaxed"
+                                            x-text="currentAnalysis.gemini_raw_response.risiko_pasar"></p>
+                                    </div>
+
+                                    <div class="bento-card bento-risk h-full flex flex-col">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Risiko Operasional</h3>
+                                        </div>
+                                        <p class="card-body text-left text-sm leading-relaxed"
+                                            x-text="currentAnalysis.gemini_raw_response.risiko_operasional"></p>
+                                    </div>
+
+                                    <div class="bento-card bento-risk h-full flex flex-col">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Risiko Hukum</h3>
+                                        </div>
+                                        <p class="card-body text-left text-sm leading-relaxed"
+                                            x-text="currentAnalysis.gemini_raw_response.risiko_hukum"></p>
+                                    </div>
+                                </div>
+
+                                <!-- SWOT & Strategi Row Wrapper -->
+                                <div class="swot-strategi-wrapper">
+
+                                    <!-- SWOT Card -->
+                                    <div class="bento-card bento-swot h-full">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Analisis SWOT</h3>
+                                        </div>
+                                        <div class="swot-grid">
+                                            <div class="swot-item swot-s">
+                                                <span class="swot-label">S (Strength)</span>
+                                                <p class="text-sm leading-relaxed" x-text="currentAnalysis.gemini_raw_response.swot?.strength"></p>
+                                            </div>
+                                            <div class="swot-item swot-w">
+                                                <span class="swot-label">W (Weakness)</span>
+                                                <p class="text-sm leading-relaxed" x-text="currentAnalysis.gemini_raw_response.swot?.weakness"></p>
+                                            </div>
+                                            <div class="swot-item swot-o">
+                                                <span class="swot-label">O (Opportunity)</span>
+                                                <p class="text-sm leading-relaxed" x-text="currentAnalysis.gemini_raw_response.swot?.opportunity"></p>
+                                            </div>
+                                            <div class="swot-item swot-t">
+                                                <span class="swot-label">T (Threat)</span>
+                                                <p class="text-sm leading-relaxed" x-text="currentAnalysis.gemini_raw_response.swot?.threat"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Strategi Eksekusi Utama -->
+                                    <div class="bento-card bento-strategi h-auto">
+                                        <div class="card-header text-left">
+                                            <h3 class="card-title text-lg font-semibold">Strategi Eksekusi Utama</h3>
+                                            <span class="badge badge-glow">Master Plan</span>
+                                        </div>
+                                        <p class="strategi-body text-left text-sm leading-relaxed"
+                                            x-text="currentAnalysis.gemini_raw_response.solusi_eksekusi_utama"></p>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </template>
+
+                    </div>
+                </main>
+
+            </div>
+        </template>
+
+    </div>
+
+    <script src="assets/js/app.js"></script>
+    <script>
+        document.addEventListener('alpine:initialized', () => lucide.createIcons());
+        document.addEventListener('alpine:updated', () => lucide.createIcons());
+    </script>
+</body>
+
+</html>

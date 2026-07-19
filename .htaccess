@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # 1. Keamanan: Blokir akses langsung ke folder sensitif
+    RewriteRule ^(\.git|src|config|database|vendor)(/|$) - [F,L]
+    
+    # 2. Keamanan: Blokir akses ke file konfigurasi
+    RewriteRule ^(\.env|composer\.json|composer\.lock|package\.json|package-lock\.json|Dockerfile)$ - [F,L]
+
+    # 3. Routing: Alihkan semua lalu lintas ke folder public/ secara transparan
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

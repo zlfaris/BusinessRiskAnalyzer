@@ -11,7 +11,7 @@
 
 Platform analisis kelayakan dan penilaian risiko bisnis berbasis Kecerdasan Buatan (AI) dengan standar penilaian ala *Venture Capitalist Consultant*. Aplikasi ini dirancang khusus untuk membantu calon pemilik usaha memetakan ancaman struktural, menghitung *runway* keuangan, dan menyusun rencana aksi taktis sebelum modal ditanamkan.
 
-## 🛠️ Tech Stack (Susunan Teknologi)
+## Tech Stack (Susunan Teknologi)
 
 Aplikasi ini dibangun dengan arsitektur yang sangat ringan, cepat, dan efisien tanpa menggunakan framework pihak ketiga:
 - **Backend Core**: PHP Native 
@@ -21,7 +21,7 @@ Aplikasi ini dibangun dengan arsitektur yang sangat ringan, cepat, dan efisien t
 
 ---
 
-## 🚀 Fitur & Komponen UI Sistem
+## Fitur & Komponen UI Sistem
 
 Sesuai dengan alur sistem pada dashboard utama, berikut adalah modul inti yang tersedia:
 
@@ -48,7 +48,7 @@ Begitu analisis dibuat, sistem langsung merender panel informasi dinamis:
 
 ---
 
-## 📁 Struktur Folder Proyek
+## Struktur Folder Proyek
 
 ```text
 BusinessRiskAnalyzer/

@@ -1,4 +1,13 @@
-# Business Risk Analyzer — Tactile Intelligence
+# Business Risk Analyzer
+
+<!-- Baris Pertama -->
+[![Backend](https://img.shields.io/badge/BACKEND-PHP%20NATIVE-ff2d20?style=for-the-badge&logo=php&logoColor=white)](#)
+[![Styling](https://img.shields.io/badge/STYLING-CUSTOM%20CSS-06b6d4?style=for-the-badge&logo=css3&logoColor=white)](#)
+[![Frontend](https://img.shields.io/badge/FRONTEND-ALPINE.JS-8bc0d0?style=for-the-badge&logo=alpinejs&logoColor=white)](#)
+
+<!-- Baris Kedua -->
+[![Database](https://img.shields.io/badge/DATABASE-MYSQL-4479a1?style=for-the-badge&logo=mysql&logoColor=white)](#)
+[![QA Testing](https://img.shields.io/badge/QA%20TESTING-MANUAL%20%26%20AUTOMATED-e9711c?style=for-the-badge&logo=checkmarx&logoColor=white)](#)
 
 Platform analisis kelayakan dan penilaian risiko bisnis berbasis Kecerdasan Buatan (AI) dengan standar penilaian ala *Venture Capitalist Consultant*. Aplikasi ini dirancang khusus untuk membantu calon pemilik usaha memetakan ancaman struktural, menghitung *runway* keuangan, dan menyusun rencana aksi taktis sebelum modal ditanamkan.
 

@@ -11,6 +11,8 @@
 
 Platform analisis kelayakan dan penilaian risiko bisnis berbasis Kecerdasan Buatan (AI) dengan standar penilaian ala *Venture Capitalist Consultant*. Aplikasi ini dirancang khusus untuk membantu calon pemilik usaha memetakan ancaman struktural, menghitung *runway* keuangan, dan menyusun rencana aksi taktis sebelum modal ditanamkan.
 
+> **Live Application Demo:** [https://bussinessriskanalyzer.freedev.app/](https://bussinessriskanalyzer.freedev.app/)
+
 ## Tech Stack (Susunan Teknologi)
 
 Aplikasi ini dibangun dengan arsitektur yang sangat ringan, cepat, dan efisien tanpa menggunakan framework pihak ketiga:
